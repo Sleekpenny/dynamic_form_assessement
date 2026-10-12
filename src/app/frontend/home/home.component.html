@@ -1,0 +1,67 @@
+<p class="p-2 uppercase text-2xl text-center font-semibold">Loan Application</p>
+<form [formGroup]="dynamicForm" (ngSubmit)="onSubmit()" class="px-6 py-4">
+  <div class="mb-6">
+    <h3 class="text-lg font-semibold text-blue-500">{{ steps[currentStep]?.category }}</h3>
+    <p class="text-sm text-gray-500">Step {{ currentStep + 1 }} of {{ steps.length }}</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    @for (field of steps[currentStep]?.fields; track field.name) {
+      <div>
+        <label class="block text-sm font-medium mb-1">{{ field.label }}</label>
+
+        @switch (field.type) {
+          @case ('select') {
+            <select [formControlName]="field.name" class="w-full border border-neutral-400 rounded-md px-3 py-2">
+              <option value="" disabled>{{ field.placeholder }}</option>
+              @for (opt of getOptions(field.options); track opt) {
+                <option [value]="opt">{{ opt }}</option>
+              }
+            </select>
+          }
+          @case ('radio') {
+            <div class="flex gap-4">
+              @for (opt of getOptions(field.options); track opt) {
+                <label class="flex items-center gap-1">
+                  <input type="radio" [formControlName]="field.name" [value]="opt" />
+                  {{ opt }}
+                </label>
+              }
+            </div>
+          }
+          @case ('textarea') {
+            <textarea [formControlName]="field.name" [placeholder]="field.placeholder"
+              class="w-full border border-neutral-400 rounded-md px-3 py-2"></textarea>
+          }
+          @case ('checkbox') {
+            <label class="flex items-center gap-2">
+              <input type="checkbox" [formControlName]="field.name" />
+              {{ field.placeholder }}
+            </label>
+          }
+          @default {
+            <input [formControlName]="field.name" [placeholder]="field.placeholder"
+              [attr.type]="field.type" class="w-full border border-neutral-400 rounded-md px-3 py-2" />
+          }
+        }
+
+        @if (dynamicForm.get(field.name)?.invalid && dynamicForm.get(field.name)?.touched) {
+          <span class="text-red-500 text-xs mt-1 block">{{ getErrorMessage(field.name) }}</span>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="flex justify-between mt-8">
+    <button type="button" (click)="previousStep()" [disabled]="currentStep === 0"
+      class="px-4 py-2 border rounded-md disabled:opacity-40 cursor-pointer">Back</button>
+
+    @if (currentStep < steps.length - 1) {
+      <button type="button" (click)="nextStep()"
+        class="px-4 py-2 bg-blue-500 rounded-md cursor-pointer hover:bg-blue-600">Next</button>
+    } @else {
+      <button type="submit" [disabled]="!dynamicForm.valid"
+        class="px-4 py-2 bg-blue-500 rounded-md disabled:opacity-40 cursor-pointer hover:bg-blue-600">Submit</button>
+    }
+  </div>
+</form>
