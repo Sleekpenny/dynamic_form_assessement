@@ -6,7 +6,7 @@ export const routes: Routes = [
     path: '',
     component: HomeLayoutComponent,
     loadChildren: () =>
-      import('./frontend/home-layout/route').then(
+      import('./frontend/home-layout/routes').then(
         (m) => m.routes
       ),
     }
